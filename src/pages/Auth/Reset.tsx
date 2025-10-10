@@ -8,6 +8,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthLayout from "./_AuthLayout";
 import { confirmResetPassword } from "aws-amplify/auth";
 
+import brandLogo from "/assets/logo1.png";
+import loginPhoto from "/assets/login_photo.png";
+
 export default function Reset() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -73,10 +76,15 @@ export default function Reset() {
 
   return (
     <AuthLayout
-      imageSrc={"/src/assets/login_photo.png"}
+      // imageSrc={"/src/assets/login_photo.png"}
+      imageSrc={loginPhoto}  
       brand={
         <>
-          <Box component="img" src="/src/assets/logo1.png" alt="ToolTrail"
+          <Box 
+          component="img" 
+          // src="/src/assets/logo1.png" 
+           src={brandLogo} 
+          alt="ToolTrail"
                sx={{ width: 60, height: 60, objectFit: "cover", display: "block" }} />
           <Typography fontSize={23} fontWeight={700} color="text.primary">ToolTrail</Typography>
         </>

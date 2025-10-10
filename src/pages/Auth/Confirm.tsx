@@ -15,6 +15,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import AuthLayout from "./_AuthLayout";
 import { confirmSignUp, resendSignUpCode } from "aws-amplify/auth";
 
+import brandLogo from "/assets/logo1.png";
+import loginPhoto from "/assets/login_photo.png";
+
 export default function Confirm() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
@@ -93,12 +96,14 @@ export default function Confirm() {
 
   return (
     <AuthLayout
-      imageSrc={"/src/assets/login_photo.png"}
+    //   imageSrc={"/src/assets/login_photo.png"}
+    imageSrc={loginPhoto}  
       brand={
         <>
           <Box
             component="img"
-            src="/src/assets/logo1.png"
+            // src="/src/assets/logo1.png"
+            src={brandLogo} 
             alt="ToolTrail"
             sx={{ width: 60, height: 60, objectFit: "cover", display: "block" }}
           />
