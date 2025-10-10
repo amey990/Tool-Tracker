@@ -13,11 +13,11 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import { useThemeMode } from "../theme";
 import { RAIL_W, TOP_H } from "./Sidebar";
-import { useNavigate } from "react-router-dom"; 
+// import { useNavigate } from "react-router-dom"; 
 
 export default function Navbar({ title }: { title: string }) {
   const { mode, toggle } = useThemeMode();
-  const navigate = useNavigate();   
+  // const navigate = useNavigate();   
 
   return (
     <AppBar
@@ -37,28 +37,6 @@ export default function Navbar({ title }: { title: string }) {
         <Typography variant="h6" sx={{ mr: "auto", fontWeight: 700, fontSize: 18, lineHeight: 1 }}>
           {title}
         </Typography>
-
-        {/* <TextField
-          placeholder="Search…"
-          size="small"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
-          }}
-          sx={{
-            maxWidth: 520,
-            "& .MuiOutlinedInput-root": {
-              borderRadius: 1,
-              height: 36,
-              bgcolor: "background.default",
-            },
-          }}
-        /> */}
-
-
         <TextField
   placeholder="Search…"
   size="small"

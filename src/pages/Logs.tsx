@@ -250,10 +250,18 @@ export default function Logs() {
   }, [tools]);
 
   // dynamic item list from data
-  const itemNames = useMemo(
-    () => ["All", ...Array.from(new Set(loans.map((l) => l.item_name).filter(Boolean))).sort()],
-    [loans]
-  );
+  // const itemNames = useMemo(
+  //   () => ["All", ...Array.from(new Set(loans.map((l) => l.item_name).filter(Boolean))).sort()],
+  //   [loans]
+  // );
+
+
+  const itemNames = useMemo(() => {
+  const s = new Set<string>();
+  tools.forEach(t => t.name && s.add(t.name));
+  loans.forEach(l => l.item_name && s.add(l.item_name));
+  return ["All", ...Array.from(s).sort()];
+}, [tools, loans]);
 
   // filter + paginate
   const filtered = useMemo(() => {
@@ -283,18 +291,19 @@ export default function Logs() {
             <Box sx={UI.filtersRight.sx}>
               <FormControl size={UI.selectSm.size} sx={UI.selectSm.sx}>
                 <InputLabel>Item Name</InputLabel>
-                <Select
-                  label="Item Name"
-                  value={itemFilter}
-                  onChange={(e) => setItemFilter(e.target.value as string)}
-                  MenuProps={UI.selectSm.menu}
-                >
-                  {itemNames.map((it) => (
-                    <MenuItem key={it} value={it}>
-                      {it}
-                    </MenuItem>
-                  ))}
-                </Select>
+              <Select
+                label="Item Name"
+                value={itemFilter}
+                onChange={(e) => setItemFilter(e.target.value as string)}
+                MenuProps={UI.selectSm.menu}
+              >
+                {itemNames.map((it) => (
+                  <MenuItem key={it} value={it}>
+                    {it}
+                  </MenuItem>
+                ))}
+              </Select>
+
               </FormControl>
 
               <FormControl size={UI.selectSm.size} sx={UI.selectSm.sx}>
