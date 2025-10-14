@@ -1067,10 +1067,10 @@ export default function Dashboard() {
     [tools]
   );
 
-  const serialOptions = useMemo(
-    () => tools.filter((t) => t.item_name === form.itemName).map((t) => t.serial_no),
-    [tools, form.itemName]
-  );
+  // const serialOptions = useMemo(
+  //   () => tools.filter((t) => t.item_name === form.itemName).map((t) => t.serial_no),
+  //   [tools, form.itemName]
+  // );
 
   const selectedTool = useMemo(
     () => tools.find((t) => t.item_name === form.itemName && t.serial_no === form.serialNo) || null,
