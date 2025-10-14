@@ -10,4 +10,14 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+    proxy: {
+      // forward all /api calls from http://localhost:5173 to your server
+      '/api': {
+        target: 'http://3.110.216.196',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })
