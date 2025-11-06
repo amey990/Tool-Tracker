@@ -1,3 +1,4 @@
+
 // import {
 //   Alert,
 //   Box,
@@ -29,9 +30,9 @@
 // import axios from "axios";
 // import { API_BASE } from "../config";
 
-// /* =================== UI tokens to match Dashboard =================== */
+// /* =================== UI tokens =================== */
 // const BRAND_GREEN = "#78B83B";
-// const CATEGORIES = ["Laptop", "Network", "Measurement", "Accessory", "Other"] as const;
+// const CATEGORIES = ["Power Tool", "Laptop", "Network", "Measurement", "Accessory", "Other"] as const;
 
 // const tableTokens = (t: Theme) => {
 //   const dark = t.palette.mode === "dark";
@@ -112,32 +113,38 @@
 
 // /* =================== Types =================== */
 // type Tool = {
-//   id: string;
-//   name: string;
+//   id: number;
+//   item_name: string;
+//   make: string | null;
+//   model: string | null;
+//   description: string | null;
 //   serial_no: string;
-//   owner_name: string;
-//   asset_tag: string;
-//   category: string;
-//   remarks: string | null;
+//   category: string | null;
+//   location: string | null;
+//   purchase_date: string | null; // yyyy-mm-dd
 // };
 
 // type ToolForm = {
-//   name: string;
-//   serial: string;
-//   owner: string;
-//   assetTag: string;
+//   item_name: string;
+//   make: string;
+//   model: string;
+//   description: string;
+//   serial_no: string;
 //   category: (typeof CATEGORIES)[number] | "";
-//   remarks: string;
+//   location: string;
+//   purchase_date: string; // yyyy-mm-dd
 // };
 
 // const normalizeTool = (t: any): Tool => ({
-//   id: t.id ?? t.tool_id ?? t.uuid ?? "",
-//   name: t.name ?? t.item_name ?? t.tool_name ?? "",
+//   id: Number(t.id ?? t.tool_id ?? 0),
+//   item_name: t.item_name ?? t.name ?? "",
+//   make: t.make ?? null,
+//   model: t.model ?? null,
+//   description: t.description ?? null,
 //   serial_no: t.serial_no ?? t.serial ?? "",
-//   owner_name: t.owner_name ?? t.owner ?? "",
-//   asset_tag: t.asset_tag ?? t.assetTag ?? "",
-//   category: t.category ?? t.type ?? "",
-//   remarks: t.remarks ?? t.note ?? null,
+//   category: t.category ?? null,
+//   location: t.location ?? null,
+//   purchase_date: t.purchase_date ?? null,
 // });
 
 // const api = axios.create({ baseURL: API_BASE });
@@ -160,72 +167,116 @@
 //   setErrorMsg: (m: string | null) => void;
 //   setSuccessMsg: (m: string | null) => void;
 // }) {
-//   const [form, setForm] = useState({
-//     name: tool?.name ?? "",
+//   const [form, setForm] = useState<ToolForm>({
+//     item_name: tool?.item_name ?? "",
+//     make: tool?.make ?? "",
+//     model: tool?.model ?? "",
+//     description: tool?.description ?? "",
 //     serial_no: tool?.serial_no ?? "",
-//     owner_name: tool?.owner_name ?? "",
-//     asset_tag: tool?.asset_tag ?? "",
-//     category: (tool?.category as ToolForm["category"]) ?? "",
-//     remarks: tool?.remarks ?? "",
+//     category: ((tool?.category as ToolForm["category"]) ?? "") as any,
+//     location: tool?.location ?? "",
+//     purchase_date: tool?.purchase_date ?? "",
 //   });
 
 //   useEffect(() => {
 //     setForm({
-//       name: tool?.name ?? "",
+//       item_name: tool?.item_name ?? "",
+//       make: tool?.make ?? "",
+//       model: tool?.model ?? "",
+//       description: tool?.description ?? "",
 //       serial_no: tool?.serial_no ?? "",
-//       owner_name: tool?.owner_name ?? "",
-//       asset_tag: tool?.asset_tag ?? "",
-//       category: (tool?.category as ToolForm["category"]) ?? "",
-//       remarks: tool?.remarks ?? "",
+//       category: ((tool?.category as ToolForm["category"]) ?? "") as any,
+//       location: tool?.location ?? "",
+//       purchase_date: tool?.purchase_date ?? "",
 //     });
 //   }, [tool]);
 
 //   const setField =
-//     (k: keyof typeof form) =>
+//     (k: keyof ToolForm) =>
 //     (e: React.ChangeEvent<HTMLInputElement>) => {
 //       setForm((f) => ({ ...f, [k]: e.target.value }));
 //     };
 
+//   // const handleSave = async () => {
+//   //   if (!tool) return;
+//   //   try {
+//   //     const payload = {
+//   //       item_name: form.item_name,
+//   //       make: form.make || null,
+//   //       model: form.model || null,
+//   //       description: form.description || null,
+//   //       serial_no: form.serial_no, // usually read-only, but backend allows update
+//   //       category: form.category || null,
+//   //       location: form.location || null,
+//   //       purchase_date: form.purchase_date || null,
+//   //     };
+//   //     // await api.put(`/tools/${tool.id}`, payload);
+//   //     // await api.patch(`/tools/${tool.id}`, payload);
+//   //      const cleanId = String(tool?.id ?? "").match(/^\d+/)?.[0] ?? tool?.id;
+//   //      await api.patch(`/tools/${cleanId}`, payload);
+
+//   //     setSuccessMsg("Tool updated");
+//   //     onSaved();
+//   //     onClose();
+//   //   } catch (err: any) {
+//   //     setErrorMsg(err?.response?.data?.error || "Failed to update tool");
+//   //   }
+//   // };
+
 //   const handleSave = async () => {
-//     if (!tool) return;
-//     try {
-//       await api.patch(`/tools/${tool.id}`, {
-//         name: form.name,
-//         serial_no: form.serial_no,
-//         owner_name: form.owner_name,
-//         asset_tag: form.asset_tag,
-//         category: form.category || null,
-//         remarks: form.remarks || null,
-//       });
-//       setSuccessMsg("Tool updated");
-//       onSaved();
-//       onClose();
-//     } catch (err: any) {
-//       const msg =
-//         err?.response?.data?.error ||
-//         (err?.response?.status === 409 ? "Duplicate Serial/Asset tag" : "Failed to update tool");
-//       setErrorMsg(msg);
-//     }
-//   };
-
-// const handleDelete = async () => {
 //   if (!tool) return;
-//   const ok = window.confirm("Delete this tool permanently?");
-//   if (!ok) return;
-
 //   try {
-//     await api.delete(`/tools/${tool.id}`);
-//     setSuccessMsg("Tool deleted");   // <-- success toast
-//     onDeleted();
+//     const payload = {
+//       item_name: form.item_name,
+//       make: form.make || null,
+//       model: form.model || null,
+//       description: form.description || null,
+//       serial_no: form.serial_no,
+//       category: form.category || null,
+//       location: form.location || null,
+//       purchase_date: form.purchase_date || null,
+//     };
+//     const cleanId = String(tool.id ?? "").match(/^\d+/)?.[0] ?? tool.id;
+//     await api.patch(`/tools/${cleanId}`, payload);   // PATCH instead of PUT
+//     setSuccessMsg("Tool updated");
+//     onSaved();
 //     onClose();
 //   } catch (err: any) {
-//     const msg =
-//       err?.response?.data?.error ||
-//       "Failed to delete tool";
-//     setErrorMsg(msg);                 // <-- error toast
+//     setErrorMsg(err?.response?.data?.error || "Failed to update tool");
 //   }
 // };
 
+//   // const handleDelete = async () => {
+//   //   if (!tool) return;
+//   //   const ok = window.confirm("Delete this tool permanently?");
+//   //   if (!ok) return;
+//   //   try {
+//   //     // await api.delete(`/tools/${tool.id}`);
+//   //      const cleanId = String(tool?.id ?? "").match(/^\d+/)?.[0] ?? tool?.id;
+//   //     await api.delete(`/tools/${cleanId}`);
+//   //     setSuccessMsg("Tool deleted");
+//   //     onDeleted();
+//   //     onClose();
+//   //   } catch (err: any) {
+//   //     setErrorMsg(err?.response?.data?.error || "Failed to delete tool");
+//   //   }
+//   // };
+
+
+//   const handleDelete = async () => {
+//   if (!tool) return;
+//   const ok = window.confirm("Delete this tool permanently?");
+//   if (!ok) return;
+//   try {
+//     const cleanId = String(tool.id ?? "").match(/^\d+/)?.[0] ?? tool.id;
+//     await api.delete(`/tools/${cleanId}`);
+//     setSuccessMsg("Tool deleted");
+//     onDeleted();
+//     onClose();
+//   } catch (err: any) {
+//     setErrorMsg(err?.response?.data?.error || "Failed to delete tool");
+//   }
+// };
 
 //   return (
 //     <Modal open={open} onClose={onClose}>
@@ -235,7 +286,7 @@
 //           top: "50%",
 //           left: "50%",
 //           transform: "translate(-50%, -50%)",
-//           width: 720,
+//           width: 820,
 //           bgcolor: "#1C1C1E",
 //           color: "#fff",
 //           borderRadius: 1,
@@ -257,47 +308,55 @@
 //           }}
 //         >
 //           <TextField
-//             label="Tool / Item Name"
+//             label="Item Name"
 //             size="small"
-//             value={form.name}
-//             onChange={setField("name")}
+//             value={form.item_name}
+//             onChange={setField("item_name")}
 //             InputLabelProps={{ sx: { color: "#aaa" } }}
 //             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
 //           />
-//           <TextField
-//             label="Serial Number"
+//           {/* <TextField
+//             label="Serial No"
 //             size="small"
 //             value={form.serial_no}
-//             // remove onChange (or keep; readOnly prevents edits anyway)
+//             onChange={setField("serial_no")}
 //             InputLabelProps={{ sx: { color: "#aaa" } }}
-//             InputProps={{ readOnly: true }}            // <-- add this
-//             sx={{
-//               bgcolor: "#28282B",
-//               input: { color: "#fff", cursor: "not-allowed" }, // optional: visual hint
-//             }}
-//           />
+//             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
+//           /> */}
+
 //           <TextField
-//             label="Owner Name"
+//           label="Serial No"
+//           size="small"
+//           value={form.serial_no}
+
+//           InputLabelProps={{ sx: { color: "#aaa" } }}
+
+//         InputProps={{ readOnly: true }}
+//         sx={{ bgcolor: "#28282B", input: { color: "#fff", cursor: "not-allowed" } }}
+//         />
+//           <TextField
+//             label="Make"
 //             size="small"
-//             value={form.owner_name}
-//             onChange={setField("owner_name")}
+//             value={form.make}
+//             onChange={setField("make")}
 //             InputLabelProps={{ sx: { color: "#aaa" } }}
 //             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
 //           />
 //           <TextField
-//             label="Asset Tag"
+//             label="Model"
 //             size="small"
-//             value={form.asset_tag}
-//             onChange={setField("asset_tag")}
+//             value={form.model}
+//             onChange={setField("model")}
 //             InputLabelProps={{ sx: { color: "#aaa" } }}
 //             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
 //           />
 //           <TextField
-//             select
 //             label="Category"
+//             select
 //             size="small"
 //             value={form.category}
-//             onChange={setField("category")}
+//             // onChange={setField("category")}
+//             onChange={(e) => setForm(f => ({ ...f, category: e.target.value as ToolForm["category"] }))}
 //             InputLabelProps={{ sx: { color: "#aaa" } }}
 //             sx={{ bgcolor: "#28282B", "& .MuiSelect-select": { color: "#fff" } }}
 //             SelectProps={{ MenuProps: { PaperProps: { sx: { bgcolor: "background.paper" } } } }}
@@ -309,10 +368,27 @@
 //             ))}
 //           </TextField>
 //           <TextField
-//             label="Remarks"
+//             label="Location"
 //             size="small"
-//             value={form.remarks}
-//             onChange={setField("remarks")}
+//             value={form.location}
+//             onChange={setField("location")}
+//             InputLabelProps={{ sx: { color: "#aaa" } }}
+//             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
+//           />
+//           <TextField
+//             label="Purchase Date"
+//             type="date"
+//             size="small"
+//             value={form.purchase_date || ""}
+//             onChange={setField("purchase_date")}
+//             InputLabelProps={{ shrink: true, sx: { color: "#aaa" } }}
+//             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
+//           />
+//           <TextField
+//             label="Description"
+//             size="small"
+//             value={form.description}
+//             onChange={setField("description")}
 //             InputLabelProps={{ sx: { color: "#aaa" } }}
 //             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
 //           />
@@ -367,12 +443,14 @@
 
 //   // add form state
 //   const initial: ToolForm = {
-//     name: "",
-//     serial: "",
-//     owner: "",
-//     assetTag: "",
+//     item_name: "",
+//     make: "",
+//     model: "",
+//     description: "",
+//     serial_no: "",
 //     category: "",
-//     remarks: "",
+//     location: "",
+//     purchase_date: "",
 //   };
 //   const [form, setForm] = useState<ToolForm>(initial);
 //   const [submitting, setSubmitting] = useState(false);
@@ -391,21 +469,17 @@
 //     };
 
 //   const canSubmit =
-//     !!form.name && !!form.serial && !!form.owner && !!form.assetTag && !!form.category;
+//     !!form.item_name && !!form.serial_no && !!form.category;
 
 //   const loadTools = async () => {
 //     setLoading(true);
 //     try {
 //       const { data } = await api.get("/tools");
-//       const arr = Array.isArray(data?.items)
-//         ? data.items
-//         : Array.isArray(data?.rows)
-//         ? data.rows
-//         : Array.isArray(data?.data)
-//         ? data.data
-//         : Array.isArray(data)
-//         ? data
-//         : [];
+//       const arr =
+//         Array.isArray(data?.rows) ? data.rows :
+//         Array.isArray(data?.items) ? data.items :
+//         Array.isArray(data?.data) ? data.data :
+//         Array.isArray(data) ? data : [];
 //       setTools(arr.map(normalizeTool));
 //     } catch {
 //       setTools([]);
@@ -419,9 +493,10 @@
 //   }, []);
 
 //   // filter + paginate
-//   const filtered = useMemo(() => {
-//     return tools.filter((t) => categoryFilter === "All" || t.category === categoryFilter);
-//   }, [tools, categoryFilter]);
+//   const filtered = useMemo(
+//     () => tools.filter((t) => categoryFilter === "All" || t.category === categoryFilter),
+//     [tools, categoryFilter]
+//   );
 
 //   const pageCount = Math.max(1, Math.ceil(filtered.length / rowsPerPage));
 //   const paginated = useMemo(
@@ -438,23 +513,23 @@
 //     setSubmitting(true);
 //     setErrorMsg(null);
 //     try {
-//       await api.post("/tools", {
-//         name: form.name,
-//         serial_no: form.serial,
-//         owner_name: form.owner,
-//         asset_tag: form.assetTag,
-//         category: form.category,
-//         remarks: form.remarks || null,
-//       });
+//       const payload = {
+//         item_name: form.item_name,
+//         make: form.make || null,
+//         model: form.model || null,
+//         description: form.description || null,
+//         serial_no: form.serial_no,
+//         category: form.category || null,
+//         location: form.location || null,
+//         purchase_date: form.purchase_date || null,
+//       };
+//       await api.post("/tools", payload);
 //       setSuccessMsg("Tool added successfully");
 //       clearAddForm();
 //       setView("list");
 //       await loadTools();
 //     } catch (err: any) {
-//       const msg =
-//         err?.response?.data?.error ||
-//         (err?.response?.status === 409 ? "Duplicate Serial/Asset tag" : "Failed to add tool");
-//       setErrorMsg(msg);
+//       setErrorMsg(err?.response?.data?.error || "Failed to add tool");
 //     } finally {
 //       setSubmitting(false);
 //     }
@@ -547,11 +622,13 @@
 //                     {[
 //                       "Sr No",
 //                       "Item Name",
+//                       "Make",
+//                       "Model",
+//                       "Description",
 //                       "Serial No",
-//                       "Owner Name",
-//                       "Asset Tag",
 //                       "Category",
-//                       "Remarks",
+//                       "Location",
+//                       "Purchase Date",
 //                       "Action",
 //                     ].map((h, i, arr) => (
 //                       <TableCell
@@ -571,7 +648,7 @@
 //                 <TableBody>
 //                   {loading ? (
 //                     <TableRow>
-//                       <TableCell colSpan={8} align="center" sx={{ py: 3 }}>
+//                       <TableCell colSpan={10} align="center" sx={{ py: 3 }}>
 //                         Loading…
 //                       </TableCell>
 //                     </TableRow>
@@ -580,12 +657,14 @@
 //                       <TableRow key={t.id} hover>
 //                         {[
 //                           (page - 1) * rowsPerPage + idx + 1,
-//                           t.name,
+//                           t.item_name,
+//                           t.make || "—",
+//                           t.model || "—",
+//                           t.description || "—",
 //                           t.serial_no,
-//                           t.owner_name,
-//                           t.asset_tag,
-//                           t.category,
-//                           t.remarks || "—",
+//                           t.category || "—",
+//                           t.location || "—",
+//                           t.purchase_date || "—",
 //                           "__ACTION__",
 //                         ].map((cell, j) => (
 //                           <TableCell key={j} sx={UI.table.bodyCell(tt)}>
@@ -616,7 +695,7 @@
 //                     ))
 //                   ) : (
 //                     <TableRow>
-//                       <TableCell colSpan={8} align="center" sx={{ color: "text.secondary", py: 3 }}>
+//                       <TableCell colSpan={10} align="center" sx={{ color: "text.secondary", py: 3 }}>
 //                         No records found
 //                       </TableCell>
 //                     </TableRow>
@@ -686,7 +765,7 @@
 //               </Typography>
 //             </Box>
 
-//             <Button variant="outlined" onClick={clearAddForm} sx={{ borderRadius: 1, textTransform: "none" }}>
+//             <Button variant="outlined" onClick={() => setForm(initial)} sx={{ borderRadius: 1, textTransform: "none" }}>
 //               Clear
 //             </Button>
 //           </Stack>
@@ -695,16 +774,16 @@
 
 //           <Stack spacing={2}>
 //             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-//               <TextField label="Tool / Item Name *" value={form.name} onChange={updateField("name")} sx={fieldSx} />
-//               <TextField label="Serial Number *" value={form.serial} onChange={updateField("serial")} sx={fieldSx} />
-//               <TextField label="Owner Name *" value={form.owner} onChange={updateField("owner")} sx={fieldSx} />
+//               <TextField label="Item Name *" value={form.item_name} onChange={updateField("item_name")} sx={fieldSx} />
+//               <TextField label="Serial No *" value={form.serial_no} onChange={updateField("serial_no")} sx={fieldSx} />
+//               <TextField label="Make" value={form.make} onChange={updateField("make")} sx={fieldSx} />
+//               <TextField label="Model" value={form.model} onChange={updateField("model")} sx={fieldSx} />
 //             </Box>
 
 //             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-//               <TextField label="Asset Tag *" value={form.assetTag} onChange={updateField("assetTag")} sx={fieldSx} />
 //               <TextField
 //                 select
-//                 label="Category *"
+//                 label="Category"
 //                 value={form.category}
 //                 onChange={updateField("category")}
 //                 sx={{
@@ -720,12 +799,21 @@
 //                   </MenuItem>
 //                 ))}
 //               </TextField>
+//               <TextField label="Location" value={form.location} onChange={updateField("location")} sx={fieldSx} />
+//               <TextField
+//                 label="Purchase Date"
+//                 type="date"
+//                 value={form.purchase_date}
+//                 onChange={updateField("purchase_date")}
+//                 InputLabelProps={{ shrink: true }}
+//                 sx={fieldSx}
+//               />
 //             </Box>
 
 //             <TextField
-//               label="Remarks"
-//               value={form.remarks}
-//               onChange={updateField("remarks")}
+//               label="Description"
+//               value={form.description}
+//               onChange={updateField("description")}
 //               sx={{
 //                 width: "100%",
 //                 "& .MuiInputBase-root": { height: 56 },
@@ -755,7 +843,9 @@
 //                     color: "text.disabled",
 //                   },
 //                 }}
-//                 onClick={handleAdd}
+//                 onClick={async () => {
+//                   await handleAdd();
+//                 }}
 //               >
 //                 {submitting ? "Adding..." : "Add Item"}
 //               </Button>
@@ -833,6 +923,33 @@ import type { Theme } from "@mui/material/styles";
 import axios from "axios";
 import { API_BASE } from "../config";
 
+/* =================== utils =================== */
+// Convert anything date-ish to YYYY-MM-DD for <input type="date">
+const toISODate = (v?: string | null): string => {
+  if (!v) return "";
+  // accept Date.toString/ISO/timestampish → normalize
+  const s = String(v);
+  // "2025-11-06" already good
+  const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  const d = new Date(s);
+  if (Number.isFinite(d.getTime())) {
+    const y = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${y}-${mm}-${dd}`;
+  }
+  return "";
+};
+
+// Display helper: YYYY-MM-DD → DD-MM-YYYY
+const isoToDMY = (v?: string | null): string => {
+  const s = toISODate(v);
+  if (!s) return "—";
+  const [y, m, d] = s.split("-");
+  return `${d}-${m}-${y}`;
+};
+
 /* =================== UI tokens =================== */
 const BRAND_GREEN = "#78B83B";
 const CATEGORIES = ["Power Tool", "Laptop", "Network", "Measurement", "Accessory", "Other"] as const;
@@ -884,10 +1001,7 @@ const UI = {
     menu: { PaperProps: { sx: { bgcolor: "background.paper" } } },
   },
   table: {
-    sx: {
-      tableLayout: "fixed" as const,
-      width: "100%",
-    },
+    sx: { tableLayout: "fixed" as const, width: "100%" },
     headCell: (tt: ReturnType<typeof tableTokens>) => ({
       color: tt.headText,
       backgroundColor: tt.headBg,
@@ -924,7 +1038,7 @@ type Tool = {
   serial_no: string;
   category: string | null;
   location: string | null;
-  purchase_date: string | null; // yyyy-mm-dd
+  purchase_date: string | null; // normalized to yyyy-mm-dd in normalizeTool
 };
 
 type ToolForm = {
@@ -947,7 +1061,7 @@ const normalizeTool = (t: any): Tool => ({
   serial_no: t.serial_no ?? t.serial ?? "",
   category: t.category ?? null,
   location: t.location ?? null,
-  purchase_date: t.purchase_date ?? null,
+  purchase_date: toISODate(t.purchase_date ?? null) || null, // ensure YYYY-MM-DD
 });
 
 const api = axios.create({ baseURL: API_BASE });
@@ -978,7 +1092,7 @@ function UpdateToolModal({
     serial_no: tool?.serial_no ?? "",
     category: ((tool?.category as ToolForm["category"]) ?? "") as any,
     location: tool?.location ?? "",
-    purchase_date: tool?.purchase_date ?? "",
+    purchase_date: toISODate(tool?.purchase_date ?? null), // auto-fill
   });
 
   useEffect(() => {
@@ -990,7 +1104,7 @@ function UpdateToolModal({
       serial_no: tool?.serial_no ?? "",
       category: ((tool?.category as ToolForm["category"]) ?? "") as any,
       location: tool?.location ?? "",
-      purchase_date: tool?.purchase_date ?? "",
+      purchase_date: toISODate(tool?.purchase_date ?? null),
     });
   }, [tool]);
 
@@ -1000,86 +1114,48 @@ function UpdateToolModal({
       setForm((f) => ({ ...f, [k]: e.target.value }));
     };
 
-  // const handleSave = async () => {
-  //   if (!tool) return;
-  //   try {
-  //     const payload = {
-  //       item_name: form.item_name,
-  //       make: form.make || null,
-  //       model: form.model || null,
-  //       description: form.description || null,
-  //       serial_no: form.serial_no, // usually read-only, but backend allows update
-  //       category: form.category || null,
-  //       location: form.location || null,
-  //       purchase_date: form.purchase_date || null,
-  //     };
-  //     // await api.put(`/tools/${tool.id}`, payload);
-  //     // await api.patch(`/tools/${tool.id}`, payload);
-  //      const cleanId = String(tool?.id ?? "").match(/^\d+/)?.[0] ?? tool?.id;
-  //      await api.patch(`/tools/${cleanId}`, payload);
-
-  //     setSuccessMsg("Tool updated");
-  //     onSaved();
-  //     onClose();
-  //   } catch (err: any) {
-  //     setErrorMsg(err?.response?.data?.error || "Failed to update tool");
-  //   }
-  // };
-
   const handleSave = async () => {
-  if (!tool) return;
-  try {
-    const payload = {
-      item_name: form.item_name,
-      make: form.make || null,
-      model: form.model || null,
-      description: form.description || null,
-      serial_no: form.serial_no,
-      category: form.category || null,
-      location: form.location || null,
-      purchase_date: form.purchase_date || null,
-    };
-    const cleanId = String(tool.id ?? "").match(/^\d+/)?.[0] ?? tool.id;
-    await api.patch(`/tools/${cleanId}`, payload);   // PATCH instead of PUT
-    setSuccessMsg("Tool updated");
-    onSaved();
-    onClose();
-  } catch (err: any) {
-    setErrorMsg(err?.response?.data?.error || "Failed to update tool");
-  }
-};
-
-  // const handleDelete = async () => {
-  //   if (!tool) return;
-  //   const ok = window.confirm("Delete this tool permanently?");
-  //   if (!ok) return;
-  //   try {
-  //     // await api.delete(`/tools/${tool.id}`);
-  //      const cleanId = String(tool?.id ?? "").match(/^\d+/)?.[0] ?? tool?.id;
-  //     await api.delete(`/tools/${cleanId}`);
-  //     setSuccessMsg("Tool deleted");
-  //     onDeleted();
-  //     onClose();
-  //   } catch (err: any) {
-  //     setErrorMsg(err?.response?.data?.error || "Failed to delete tool");
-  //   }
-  // };
-
+    if (!tool) return;
+    try {
+      const payload = {
+        item_name: form.item_name,
+        make: form.make || null,
+        model: form.model || null,
+        description: form.description || null,
+        serial_no: form.serial_no, // read-only in UI but allowed by API
+        category: form.category || null,
+        location: form.location || null,
+        purchase_date: form.purchase_date || null, // must be yyyy-mm-dd
+      };
+      const cleanId = String(tool.id ?? "").match(/^\d+/)?.[0] ?? tool.id;
+      await api.patch(`/tools/${cleanId}`, payload);
+      setSuccessMsg("Tool updated");
+      onSaved();
+      onClose();
+    } catch (err: any) {
+      setErrorMsg(err?.response?.data?.error || "Failed to update tool");
+    }
+  };
 
   const handleDelete = async () => {
-  if (!tool) return;
-  const ok = window.confirm("Delete this tool permanently?");
-  if (!ok) return;
-  try {
-    const cleanId = String(tool.id ?? "").match(/^\d+/)?.[0] ?? tool.id;
-    await api.delete(`/tools/${cleanId}`);
-    setSuccessMsg("Tool deleted");
-    onDeleted();
-    onClose();
-  } catch (err: any) {
-    setErrorMsg(err?.response?.data?.error || "Failed to delete tool");
-  }
-};
+    if (!tool) return;
+    const ok = window.confirm("Delete this tool permanently?");
+    if (!ok) return;
+    try {
+      const cleanId = String(tool.id ?? "").match(/^\d+/)?.[0] ?? tool.id;
+      await api.delete(`/tools/${cleanId}`);
+      setSuccessMsg("Tool deleted");
+      onDeleted();
+      onClose();
+    } catch (err: any) {
+      // surface backend 409 details if present
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        "Failed to delete tool";
+      setErrorMsg(msg);
+    }
+  };
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -1118,25 +1194,16 @@ function UpdateToolModal({
             InputLabelProps={{ sx: { color: "#aaa" } }}
             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
           />
-          {/* <TextField
+
+          <TextField
             label="Serial No"
             size="small"
             value={form.serial_no}
-            onChange={setField("serial_no")}
             InputLabelProps={{ sx: { color: "#aaa" } }}
-            sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
-          /> */}
+            InputProps={{ readOnly: true }}
+            sx={{ bgcolor: "#28282B", input: { color: "#fff", cursor: "not-allowed" } }}
+          />
 
-          <TextField
-          label="Serial No"
-          size="small"
-          value={form.serial_no}
-
-          InputLabelProps={{ sx: { color: "#aaa" } }}
-
-        InputProps={{ readOnly: true }}
-        sx={{ bgcolor: "#28282B", input: { color: "#fff", cursor: "not-allowed" } }}
-        />
           <TextField
             label="Make"
             size="small"
@@ -1153,13 +1220,15 @@ function UpdateToolModal({
             InputLabelProps={{ sx: { color: "#aaa" } }}
             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
           />
+
           <TextField
             label="Category"
             select
             size="small"
             value={form.category}
-            // onChange={setField("category")}
-            onChange={(e) => setForm(f => ({ ...f, category: e.target.value as ToolForm["category"] }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, category: e.target.value as ToolForm["category"] }))
+            }
             InputLabelProps={{ sx: { color: "#aaa" } }}
             sx={{ bgcolor: "#28282B", "& .MuiSelect-select": { color: "#fff" } }}
             SelectProps={{ MenuProps: { PaperProps: { sx: { bgcolor: "background.paper" } } } }}
@@ -1170,6 +1239,7 @@ function UpdateToolModal({
               </MenuItem>
             ))}
           </TextField>
+
           <TextField
             label="Location"
             size="small"
@@ -1178,6 +1248,8 @@ function UpdateToolModal({
             InputLabelProps={{ sx: { color: "#aaa" } }}
             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
           />
+
+          {/* keep native date input for good UX; it needs YYYY-MM-DD */}
           <TextField
             label="Purchase Date"
             type="date"
@@ -1187,6 +1259,7 @@ function UpdateToolModal({
             InputLabelProps={{ shrink: true, sx: { color: "#aaa" } }}
             sx={{ bgcolor: "#28282B", input: { color: "#fff" } }}
           />
+
           <TextField
             label="Description"
             size="small"
@@ -1271,8 +1344,7 @@ export default function Tools() {
       setForm((f) => ({ ...f, [k]: e.target.value }));
     };
 
-  const canSubmit =
-    !!form.item_name && !!form.serial_no && !!form.category;
+  const canSubmit = !!form.item_name && !!form.serial_no && !!form.category;
 
   const loadTools = async () => {
     setLoading(true);
@@ -1284,8 +1356,9 @@ export default function Tools() {
         Array.isArray(data?.data) ? data.data :
         Array.isArray(data) ? data : [];
       setTools(arr.map(normalizeTool));
-    } catch {
+    } catch (e: any) {
       setTools([]);
+      setErrorMsg(e?.response?.data?.error || "Failed to load tools");
     } finally {
       setLoading(false);
     }
@@ -1324,7 +1397,7 @@ export default function Tools() {
         serial_no: form.serial_no,
         category: form.category || null,
         location: form.location || null,
-        purchase_date: form.purchase_date || null,
+        purchase_date: form.purchase_date || null, // yyyy-mm-dd
       };
       await api.post("/tools", payload);
       setSuccessMsg("Tool added successfully");
@@ -1467,7 +1540,7 @@ export default function Tools() {
                           t.serial_no,
                           t.category || "—",
                           t.location || "—",
-                          t.purchase_date || "—",
+                          isoToDMY(t.purchase_date), // << display DD-MM-YYYY
                           "__ACTION__",
                         ].map((cell, j) => (
                           <TableCell key={j} sx={UI.table.bodyCell(tt)}>
